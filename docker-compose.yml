@@ -1,15 +1,36 @@
 version: '3.1'
 services:
   stats-server:
+    build: ./stat_svc/stat_svc_main
+    container_name: stat_svc
     ports:
       - "9090:9090"
+      - "8082:8082"
+    depends_on:
+      - stats-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/explore
+      - DB_NAME=explore
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - DB_HOST=stats-db
+      - DB_PORT=5432
+      #      - TZ=Europe/Moscow
 
   stats-db:
     image: postgres:14-alpine
-
-  ewm-service:
+    container_name: stat_svc_db
     ports:
-      - "8080:8080"
+      - "6541:5432"
+    environment:
+      - POSTGRES_DB=explore
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+    #      - TZ=Europe/Moscow
 
-  ewm-db:
-    image: postgres:14-alpine
+#  ewm-service:
+#    ports:
+#      - "8080:8080"
+#
+#  ewm-db:
+#    image: postgres:14-alpine
