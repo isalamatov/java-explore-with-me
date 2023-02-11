@@ -1,5 +1,3 @@
-
-
 DROP TABLE IF EXISTS
     public.requests,
     public.compilations_events,

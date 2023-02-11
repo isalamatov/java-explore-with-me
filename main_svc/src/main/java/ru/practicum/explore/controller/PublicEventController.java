@@ -22,7 +22,7 @@ public class PublicEventController {
     private final EventService eventService;
 
     @GetMapping("/events")
-    public List<EventShortDto> getEventsByUserBySearchParams(@RequestParam
+    public List<EventShortDto> getEventsByUserBySearchParams(@RequestParam(required = false, defaultValue = "")
                                                              String text,
                                                              @RequestParam
                                                              List<Long> categories,

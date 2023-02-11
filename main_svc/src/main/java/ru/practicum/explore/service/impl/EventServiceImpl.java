@@ -1,17 +1,15 @@
 package ru.practicum.explore.service.impl;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
-import feign.Feign;
-import feign.codec.Encoder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FeignClientsConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.practicum.explore.client.StatsClient;
 import ru.practicum.explore.dto.EventFullDto;
 import ru.practicum.explore.dto.EventShortDto;
 import ru.practicum.explore.dto.NewEventDto;
@@ -31,7 +29,6 @@ import ru.practicum.explore.repository.EventRepository;
 import ru.practicum.explore.repository.RequestRepository;
 import ru.practicum.explore.repository.UserRepository;
 import ru.practicum.explore.service.EventService;
-import ru.practicum.explore.stats.dto.EndpointHitDto;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -45,6 +42,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Primary
 @RequiredArgsConstructor
+@PropertySource("classpath:application.properties")
 @Import(FeignClientsConfiguration.class)
 public class EventServiceImpl implements EventService {
     private final CategoryRepository categoryRepository;
@@ -53,14 +51,7 @@ public class EventServiceImpl implements EventService {
     private final RequestRepository requestRepository;
     private final EventMapper eventMapper;
     private final RequestMapper requestMapper;
-
-    private final StatsClient statsClient = Feign.builder()
-            .encoder(new Encoder.Default())
-            .target(StatsClient.class, "http://localhost:9090");
     private final Integer MAX_DELAY_FOR_PUBLISH = 1;
-
-    private final String serviceIdentifier = "ewm-main-service";
-
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
@@ -248,7 +239,6 @@ public class EventServiceImpl implements EventService {
         List<Event> events = eventRepository.findAll(finalCondition, page).stream()
                 .filter(x -> x.getParticipantLimit() > x.getConfirmedRequests())
                 .map(x -> x.setViews(x.getViews() + 1))
-                .peek(x -> informStatsServer(serviceIdentifier, request))
                 .sorted(comparator)
                 .collect(Collectors.toList());
         List<EventShortDto> eventShortDtos = eventMapper.toShortDto(events);
@@ -263,7 +253,6 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new EntityDoesNotExistsException(Event.class, eventId));
         EventFullDto eventFullDto = eventMapper.toFullDto(event);
         event.setViews(event.getViews() + 1);
-        informStatsServer(serviceIdentifier, request);
         log.debug("Get event {} request processed in controller {}", eventId, this.getClass());
         return eventFullDto;
     }
@@ -320,18 +309,8 @@ public class EventServiceImpl implements EventService {
         if (request.getTitle() != null) {
             event.setTitle(request.getTitle());
         }
-    }
-
-    private void informStatsServer(String serviceIdentifier, HttpServletRequest request) {
-        String uri = request.getRequestURI();
-        String ipAddr = request.getRemoteAddr();
-        String timestamp = LocalDateTime.now().format(formatter);
-        EndpointHitDto endpointHitDto = new EndpointHitDto(null, serviceIdentifier, uri, ipAddr, timestamp);
-        String body = endpointHitDto.toString();
-        try {
-            statsClient.hit(body);
-        } catch (Exception exception) {
-            log.info("Some problems were experienced while sending statistics data: '\n' {}", exception.getMessage());
+        if (request.getPaid() != null) {
+            event.setPaid(request.getPaid());
         }
     }
 }

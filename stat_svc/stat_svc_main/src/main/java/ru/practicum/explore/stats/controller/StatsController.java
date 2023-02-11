@@ -34,5 +34,4 @@ public class StatsController {
         log.debug("Endpoint hit processed by controller {}", this.getClass());
         return viewStatsDtos;
     }
-
 }
