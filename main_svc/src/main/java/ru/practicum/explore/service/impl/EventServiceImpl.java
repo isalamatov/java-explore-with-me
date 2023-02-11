@@ -2,6 +2,7 @@ package ru.practicum.explore.service.impl;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import feign.Feign;
+import feign.codec.Encoder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FeignClientsConfiguration;
@@ -53,7 +54,9 @@ public class EventServiceImpl implements EventService {
     private final EventMapper eventMapper;
     private final RequestMapper requestMapper;
 
-    private final StatsClient statsClient = Feign.builder().target(StatsClient.class, "http://localhost:8080");
+    private final StatsClient statsClient = Feign.builder()
+            .encoder(new Encoder.Default())
+            .target(StatsClient.class, "http://localhost:9090");
     private final Integer MAX_DELAY_FOR_PUBLISH = 1;
 
     private final String serviceIdentifier = "ewm-main-service";
@@ -320,11 +323,15 @@ public class EventServiceImpl implements EventService {
     }
 
     private void informStatsServer(String serviceIdentifier, HttpServletRequest request) {
-        String app = serviceIdentifier;
         String uri = request.getRequestURI();
         String ipAddr = request.getRemoteAddr();
         String timestamp = LocalDateTime.now().format(formatter);
-        EndpointHitDto endpointHitDto = new EndpointHitDto(null, app, uri, ipAddr, timestamp);
-//        statsClient.hit(endpointHitDto);
+        EndpointHitDto endpointHitDto = new EndpointHitDto(null, serviceIdentifier, uri, ipAddr, timestamp);
+        String body = endpointHitDto.toString();
+        try {
+            statsClient.hit(body);
+        } catch (Exception exception) {
+            log.info("Some problems were experienced while sending statistics data: '\n' {}", exception.getMessage());
+        }
     }
 }

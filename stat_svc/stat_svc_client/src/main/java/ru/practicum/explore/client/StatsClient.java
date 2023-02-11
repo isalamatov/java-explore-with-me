@@ -1,10 +1,10 @@
 package ru.practicum.explore.client;
 
+import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
-import ru.practicum.explore.stats.dto.EndpointHitDto;
 import ru.practicum.explore.stats.dto.ViewStatsDto;
 
 import java.util.List;
@@ -12,8 +12,9 @@ import java.util.List;
 @FeignClient("stats")
 public interface StatsClient {
 
-    @RequestLine("GET /hit")
-    void hit(@RequestBody EndpointHitDto endpointHitDto);
+    @RequestLine("POST /hit")
+    @Headers("Content-Type: application/json")
+    void hit(@RequestBody String endpointHitDto);
 
     @RequestLine("GET /stats?start={start}&end={end}&uris={uris}&unique={unique}")
     List<ViewStatsDto> get(@Param("start") String start,
