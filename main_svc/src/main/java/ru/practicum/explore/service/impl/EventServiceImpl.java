@@ -51,7 +51,7 @@ public class EventServiceImpl implements EventService {
     private final RequestRepository requestRepository;
     private final EventMapper eventMapper;
     private final RequestMapper requestMapper;
-    private final Integer MAX_DELAY_FOR_PUBLISH = 1;
+    private final Integer maxDelayForPublish = 1;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
@@ -300,7 +300,7 @@ public class EventServiceImpl implements EventService {
             event.setState(EventStateEnum.CANCELED);
         }
         if (request.getStateAction() == StateActionEnum.PUBLISH_EVENT) {
-            if (event.getEventDate().plusHours(MAX_DELAY_FOR_PUBLISH).isBefore(LocalDateTime.now())
+            if (event.getEventDate().plusHours(maxDelayForPublish).isBefore(LocalDateTime.now())
                     || !event.getState().equals(EventStateEnum.PENDING)) {
                 throw new ConflictException(StateActionEnum.class);
             }

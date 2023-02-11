@@ -24,11 +24,11 @@ import java.util.List;
 @PropertySource("classpath:application.properties")
 public class StatsInterceptor implements HandlerInterceptor {
     @Value("${stats.server.addr}")
-    private String STATS_SERVER_ADDR;
+    private String statsServerAddr;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final String serviceIdentifier = "ewm-main-service";
 
-    private final List<String> CONTROLLED_ENDPOINTS = List.of("/events");
+    private final List<String> controlledEndpoints = List.of("/events");
 
     private StatsClient statsClient;
 
@@ -42,8 +42,8 @@ public class StatsInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String uri = request.getRequestURI();
-        for (String controlled_endpoint : CONTROLLED_ENDPOINTS) {
-            if (uri.startsWith(controlled_endpoint)) {
+        for (String controlledEndpoint : controlledEndpoints) {
+            if (uri.startsWith(controlledEndpoint)) {
                 informStatsServer(serviceIdentifier, request);
             }
         }
@@ -65,8 +65,8 @@ public class StatsInterceptor implements HandlerInterceptor {
     }
 
     private String initServerAddr() {
-        if (STATS_SERVER_ADDR != null && !STATS_SERVER_ADDR.isBlank()) {
-            return STATS_SERVER_ADDR;
+        if (statsServerAddr != null && !statsServerAddr.isBlank()) {
+            return statsServerAddr;
         } else {
             log.info("Statistics server address not defined");
             throw new RuntimeException("Statistics server address not defined");
