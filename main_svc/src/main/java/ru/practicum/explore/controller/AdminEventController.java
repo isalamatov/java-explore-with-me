@@ -8,6 +8,7 @@ import ru.practicum.explore.model.UpdateEventAdminRequest;
 import ru.practicum.explore.service.EventService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class AdminEventController {
                                                       @RequestParam(required = false, defaultValue = "0")
                                                       @PositiveOrZero Integer from,
                                                       @RequestParam(required = false, defaultValue = "25")
-                                                      @PositiveOrZero Integer size) {
+                                                      @Positive Integer size) {
         log.debug("Search events request received in controller {}", this.getClass());
         List<EventFullDto> eventFullDtos = eventService.getEventsBySearchParams(users,
                 states,

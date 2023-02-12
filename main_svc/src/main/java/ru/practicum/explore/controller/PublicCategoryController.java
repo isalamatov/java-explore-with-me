@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.explore.dto.CategoryDto;
 import ru.practicum.explore.service.CategoryService;
 
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class PublicCategoryController {
     public List<CategoryDto> getAllCategories(@RequestParam(required = false, defaultValue = "0")
                                               @PositiveOrZero Integer from,
                                               @RequestParam(required = false, defaultValue = "25")
-                                              @PositiveOrZero Integer size) {
+                                              @Positive Integer size) {
         log.debug("Get categories request received in controller {}", this.getClass());
         List<CategoryDto> categoryDtos = categoryService.getAllCategories(from, size);
         log.debug("Get categories request processed in controller {}", this.getClass());

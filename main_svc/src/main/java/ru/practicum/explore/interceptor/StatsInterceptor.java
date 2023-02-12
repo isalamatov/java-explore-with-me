@@ -1,11 +1,14 @@
 package ru.practicum.explore.interceptor;
 
 import feign.Feign;
-import feign.codec.Encoder;
+import feign.jackson.JacksonDecoder;
+import feign.jackson.JacksonEncoder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import ru.practicum.explore.client.StatsClient;
@@ -26,25 +29,24 @@ public class StatsInterceptor implements HandlerInterceptor {
     @Value("${stats.server.addr}")
     private String statsServerAddr;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private final String serviceIdentifier = "ewm-main-service";
-
-    private final List<String> controlledEndpoints = List.of("/events");
-
+    private static final String SERVICE_IDENTIFIER = "ewm-main-service";
+    private static final List<String> CONTROLLED_ENDPOINTS = List.of("/events");
     private StatsClient statsClient;
 
     @PostConstruct
     private void postConstruct() {
         this.statsClient = Feign.builder()
-                .encoder(new Encoder.Default())
+                .encoder(new JacksonEncoder())
+                .decoder(new ResponseEntityDecoder(new JacksonDecoder()))
                 .target(StatsClient.class, initServerAddr());
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String uri = request.getRequestURI();
-        for (String controlledEndpoint : controlledEndpoints) {
+        for (String controlledEndpoint : CONTROLLED_ENDPOINTS) {
             if (uri.startsWith(controlledEndpoint)) {
-                informStatsServer(serviceIdentifier, request);
+                informStatsServer(SERVICE_IDENTIFIER, request);
             }
         }
         return true;
@@ -57,10 +59,10 @@ public class StatsInterceptor implements HandlerInterceptor {
         EndpointHitDto endpointHitDto = new EndpointHitDto(null, serviceIdentifier, uri, ipAddr, timestamp);
         String body = endpointHitDto.toString();
         log.info("Sending endpoint hit DTO: {}", body);
-        try {
-            statsClient.hit(body);
-        } catch (Exception exception) {
-            log.info("Some problems were experienced while sending statistics data: '\n' {}", exception.getMessage());
+        ResponseEntity<Object> response = statsClient.hit(endpointHitDto);
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            log.info("Some problems were experienced while sending statistics data: '\n' {} '\n' {}",
+                    response.getStatusCode(), response.getBody());
         }
     }
 

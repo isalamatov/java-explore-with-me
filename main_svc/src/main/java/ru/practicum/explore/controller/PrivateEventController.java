@@ -14,6 +14,7 @@ import ru.practicum.explore.model.UpdateEventUserRequest;
 import ru.practicum.explore.service.EventService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class PrivateEventController {
                                                  @RequestParam(required = false, defaultValue = "0")
                                                  @PositiveOrZero Integer from,
                                                  @RequestParam(required = false, defaultValue = "25")
-                                                 @PositiveOrZero Integer size) {
+                                                 @Positive Integer size) {
         log.debug("Get events by userId {} received in controller {}", userId, this.getClass());
         List<EventShortDto> eventShortDtos = eventService.getEventsByUserId(userId, from, size);
         log.debug("Get events {} by userId {} processed in controller {}", eventShortDtos, userId, this.getClass());

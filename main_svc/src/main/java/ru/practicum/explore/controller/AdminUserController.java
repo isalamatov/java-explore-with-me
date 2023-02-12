@@ -9,6 +9,7 @@ import ru.practicum.explore.model.NewUserRequest;
 import ru.practicum.explore.service.UserService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class AdminUserController {
                                   @RequestParam(required = false, defaultValue = "0")
                                   @PositiveOrZero Integer from,
                                   @RequestParam(required = false, defaultValue = "25")
-                                  @PositiveOrZero Integer size) {
+                                  @Positive Integer size) {
         log.debug("Get users {} request received in controller {}", ids, this.getClass());
         List<UserDto> users = userService.getUsers(ids, from, size);
         log.debug("Get users {} request processed in controller {}", ids, this.getClass());

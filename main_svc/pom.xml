@@ -125,6 +125,12 @@
             <scope>import</scope>
         </dependency>
 
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-jackson</artifactId>
+            <version>12.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>

@@ -12,6 +12,7 @@ import ru.practicum.explore.enums.SortEnum;
 import ru.practicum.explore.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class PublicEventController {
                                                              @RequestParam(required = false, defaultValue = "0")
                                                              @PositiveOrZero Integer from,
                                                              @RequestParam(required = false, defaultValue = "25")
-                                                             @PositiveOrZero Integer size,
+                                                             @Positive Integer size,
                                                              HttpServletRequest request) {
         log.debug("Search events request received in controller {}", this.getClass());
         List<EventShortDto> eventShortDtos = eventService.getEventsByUserBySearchParams(text,
