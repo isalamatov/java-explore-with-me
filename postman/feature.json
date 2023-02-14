@@ -811,7 +811,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Ответ должен содержать код статуса 204\", function () {",
+									"pm.test(\"Ответ должен содержать код статуса 204 !\", function () {",
 									"    pm.response.to.have.status(204);   ",
 									"});"
 								],
@@ -898,7 +898,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Ответ должен содержать код статуса 204\", function () {",
+									"pm.test(\"Ответ должен содержать код статуса 204 !\", function () {",
 									"    pm.response.to.have.status(204);   ",
 									"});"
 								],
