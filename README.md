@@ -1,3 +1,5 @@
+https://github.com/isalamatov/java-explore-with-me/pull/3
+
 # java-explore-with-me
 В качестве дополнительного функционала выбрана функциональная возможность добавления like/dislike к событям
 авторизованными пользователями. 
