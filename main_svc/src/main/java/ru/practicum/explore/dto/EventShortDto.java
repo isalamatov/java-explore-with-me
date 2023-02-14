@@ -34,4 +34,6 @@ public class EventShortDto {
     private String title;
     @JsonProperty("views")
     private Long views;
+    @JsonProperty("rating")
+    private Long rating;
 }

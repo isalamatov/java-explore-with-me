@@ -8,6 +8,7 @@ import ru.practicum.explore.enums.EventStateEnum;
 import ru.practicum.explore.model.Location;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * EventFullDto
@@ -50,4 +51,8 @@ public class EventFullDto {
     private String title;
     @JsonProperty("views")
     private Long views;
+    @JsonProperty("rating")
+    private Long rating;
+    @JsonProperty("likedBy")
+    private List<UserShortDto> likedBy;
 }
