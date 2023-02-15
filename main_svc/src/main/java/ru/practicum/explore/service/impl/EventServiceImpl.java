@@ -234,6 +234,8 @@ public class EventServiceImpl implements EventService {
             comparator = Comparator.comparing(Event::getEventDate);
         } else if (sort.equals(SortEnum.VIEWS)) {
             comparator = Comparator.comparing(Event::getViews);
+        } else if (sort.equals(SortEnum.RATING)) {
+            comparator = Comparator.comparing(Event::getRating).reversed();
         }
         Pageable page = PageRequest.of(from / size, size);
         List<Event> events = eventRepository.findAll(finalCondition, page).stream()

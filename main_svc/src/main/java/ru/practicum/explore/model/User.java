@@ -25,4 +25,16 @@ public class User {
     private String name;
     @OneToMany(mappedBy = "requester")
     private List<ParticipationRequest> requests;
+    @ManyToMany
+    @JoinTable(
+            name = "events_likes",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id"))
+    private List<Event> likedEvents;
+    @ManyToMany
+    @JoinTable(
+            name = "events_dislikes",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id"))
+    private List<Event> dislikedEvents;
 }
