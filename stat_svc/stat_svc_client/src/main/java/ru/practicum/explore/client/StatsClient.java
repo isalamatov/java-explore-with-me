@@ -1,11 +1,11 @@
 package ru.practicum.explore.client;
 
+import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import ru.practicum.explore.stats.dto.EndpointHitDto;
 import ru.practicum.explore.stats.dto.ViewStatsDto;
 
@@ -14,8 +14,9 @@ import java.util.List;
 @FeignClient("stats")
 public interface StatsClient {
 
-    @RequestMapping(method = RequestMethod.POST, value = "/hit")
-    void hit(@RequestBody EndpointHitDto endpointHitDto);
+    @RequestLine("POST /hit")
+    @Headers("Content-Type: application/json")
+    ResponseEntity<Object> hit(@RequestBody EndpointHitDto endpointHitDto);
 
     @RequestLine("GET /stats?start={start}&end={end}&uris={uris}&unique={unique}")
     List<ViewStatsDto> get(@Param("start") String start,
