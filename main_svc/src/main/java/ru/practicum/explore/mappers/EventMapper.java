@@ -10,7 +10,7 @@ import ru.practicum.explore.service.impl.CategoryServiceImpl;
 import java.util.List;
 
 @Mapper(componentModel = "spring",
-        uses = CategoryServiceImpl.class)
+        uses = {CategoryServiceImpl.class, UserMapperImpl.class})
 public interface EventMapper {
 
     Event fromNewEventDto(NewEventDto newEventDto);

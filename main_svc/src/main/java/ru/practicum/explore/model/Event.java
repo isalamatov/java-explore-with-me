@@ -45,4 +45,17 @@ public class Event {
     private Long views = 0L;
     @OneToMany(mappedBy = "event")
     private List<ParticipationRequest> requests;
+    @ManyToMany(mappedBy = "likedEvents")
+    private List<User> likedBy;
+    @ManyToMany(mappedBy = "dislikedEvents")
+    private List<User> dislikedBy;
+    private Long rating = 0L;
+
+    public void incrementRating() {
+        this.rating++;
+    }
+
+    public void decrementRating() {
+        this.rating--;
+    }
 }

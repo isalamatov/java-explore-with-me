@@ -12,6 +12,7 @@ import ru.practicum.explore.model.EventRequestStatusUpdateRequest;
 import ru.practicum.explore.model.EventRequestStatusUpdateResult;
 import ru.practicum.explore.model.UpdateEventUserRequest;
 import ru.practicum.explore.service.EventService;
+import ru.practicum.explore.service.RatingService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -24,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PrivateEventController {
     private final EventService eventService;
+    private final RatingService ratingService;
 
     @GetMapping
     public List<EventShortDto> getEventsByUserId(@PathVariable Long userId,
@@ -84,5 +86,38 @@ public class PrivateEventController {
         EventRequestStatusUpdateResult result = eventService.changeRequestState(userId, eventId, request);
         log.debug("Change request state for event {} by userId {} processed in controller {}", eventId, userId, this.getClass());
         return result;
+    }
+
+    @PutMapping("/{eventId}/like")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addLike(@PathVariable long eventId, @PathVariable long userId) {
+        log.debug("Add like request to event {} from user {} received in controller {}", eventId, userId, this.getClass());
+        ratingService.addLike(eventId, userId);
+        log.debug("Add like request to event {} from user {} processed in controller {}", eventId, userId, this.getClass());
+    }
+
+    @PutMapping("/{eventId}/dislike")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addDislike(@PathVariable long eventId, @PathVariable long userId) {
+        log.debug("Add dislike request to event {} from user {} received in controller {}", eventId, userId, this.getClass());
+        ratingService.addDislike(eventId, userId);
+        log.debug("Add dislike request to event {} from user {} processed in controller {}", eventId, userId, this.getClass());
+
+    }
+
+    @DeleteMapping("/{eventId}/like")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteLike(@PathVariable long eventId, @PathVariable long userId) {
+        log.debug("Delete like request to event {} from user {} received in controller {}", eventId, userId, this.getClass());
+        ratingService.deleteLike(eventId, userId);
+        log.debug("Delete like request to event {} from user {} processed in controller {}", eventId, userId, this.getClass());
+    }
+
+    @DeleteMapping("/{eventId}/dislike")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteDislike(@PathVariable long eventId, @PathVariable long userId) {
+        log.debug("Delete dislike request to event {} from user {} received in controller {}", eventId, userId, this.getClass());
+        ratingService.deleteDislike(eventId, userId);
+        log.debug("Delete dislike request to event {} from user {} processed in controller {}", eventId, userId, this.getClass());
     }
 }
